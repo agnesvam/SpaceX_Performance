@@ -10,10 +10,15 @@ on:
 jobs:
   k6-tests:
     runs-on: ubuntu-latest
+    permissions: 
+      contents: write
     
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      with:
+       token: ${{ secrets.GITHUB_TOKEN }}
+       fetch-depth: 0
       
     - name: Custom variables used in this run
       run: echo TEST_TYPE is ${{ vars.TEST_TYPE }}
@@ -29,6 +34,14 @@ jobs:
       uses: grafana/k6-action@v0.3.1
       with:
         filename: crew/CreateCrew.js
+
+    - name: Upload K6 Performance Reports
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: k6-performance-reports
+        path: reports/
+        retention-days: 30
         
     - name: Commit and Push Reports
       if: always()

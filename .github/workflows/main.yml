@@ -15,6 +15,9 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
       
+    - name: Custom variables used in this run
+      run: echo TEST_TYPE is ${{ vars.TEST_TYPE }}
+      
     - name: Run K6 Rocket Tests
       uses: grafana/k6-action@v0.3.1
       with:

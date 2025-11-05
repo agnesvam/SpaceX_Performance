@@ -29,11 +29,12 @@ jobs:
       uses: grafana/k6-action@v0.3.1
       with:
         filename: crew/CreateCrew.js
-
-    - name: Store K6 Performance Reports
-      uses: actions/upload-artifact@v5.0.0
+        
+    - name: Commit and Push Reports
       if: always()
-      with:
-        name: k6-performance-reports
-        path: reports/
-        retention-days: 30
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add reports/
+        git diff --staged --quiet || git commit -m "Add K6 performance reports from workflow run ${{ github.run_number }}"
+        git push

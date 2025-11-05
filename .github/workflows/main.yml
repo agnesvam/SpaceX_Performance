@@ -43,11 +43,4 @@ jobs:
         path: reports/
         retention-days: 30
         
-    - name: Commit and Push Reports
-      if: always()
-      run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
-        git add reports/
-        git diff --staged --quiet || git commit -m "Add K6 performance reports from workflow run ${{ github.run_number }}"
-        git push
+

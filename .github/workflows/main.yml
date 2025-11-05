@@ -14,6 +14,9 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+
+    - name: Display custom environment variables
+      run: echo "TEST_TYPE ${{ vars.TEST_TYPE }}"
       
     - name: Run K6 Rocket Tests
       uses: grafana/k6-action@v0.3.1

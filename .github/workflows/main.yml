@@ -15,7 +15,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
       
-    - name: Run K6 Load Tests
+    - name: Run K6 Rocket Tests
       uses: grafana/k6-action@v0.3.1
       with:
         filename: rockets/GetRocket.js

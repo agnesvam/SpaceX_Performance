@@ -8,6 +8,24 @@ on:
   schedule: 
    - cron: '0 8 * * 1'   # Auto: Every Monday at 8 AM UTC
   workflow_dispatch:     # Manual: Click "Run workflow" button
+     inputs:
+      test_type:
+       required: true
+       default: 'load'
+       type: choice
+       options:
+        - load
+        - spike
+      virtual_users:
+        required: true
+        default: '30'
+        type: string
+      max_vus:
+        description: 'Max VUs for spike test'
+        required: true
+        default: '100'
+        type: string
+    
 
 jobs:
   k6-tests:
@@ -23,19 +41,28 @@ jobs:
        fetch-depth: 0
       
     - name: Custom variables used in this run
-      run: echo TEST_TYPE is ${{ vars.TEST_TYPE }}
+      run:  |
+        echo "TEST_TYPE is ${{ vars.TEST_TYPE || github.event.inputs.test_type || 'load' }}"
+        echo "VIRTUAL_USERS is ${{ github.event.inputs.virtual_users || '30' }}"
+        echo "MAX_VUS is ${{ github.event.inputs.max_vus || '100' }}"
       
     - name: Run K6 Rocket Tests
       uses: grafana/k6-action@v0.3.1
       with:
         filename: rockets/GetRocket.js
       env:
-        TEST_TYPE: ${{ vars.TEST_TYPE }}
+        TEST_TYPE: ${{ vars.TEST_TYPE || github.event.inputs.test_type || 'load' }}
+        VUS: ${{ github.event.inputs.virtual_users || '30' }}
+        MAX_VUS: ${{ github.event.inputs.max_vus || '100' }}
+        
         
     - name: Run K6 Crew Tests
       uses: grafana/k6-action@v0.3.1
       with:
         filename: crew/CreateCrew.js
+      env:
+        VUS: ${{ github.event.inputs.virtual_users || '30' }}
+        MAX_VUS: ${{ github.event.inputs.max_vus || '100' }}
 
     - name: Upload K6 Performance Reports
       uses: actions/upload-artifact@v4
